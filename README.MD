@@ -40,3 +40,6 @@ Specify a GKE cluster name, cluster domain name for MongoDB, and machine type fo
 ### Verify metrics in `Managed Service for Prometheus`
 <img src="screenshot/5.png">
 <img src="screenshot/6.png">
+
+### Velero for backup & restore
+<img src="screenshot/7.png">
