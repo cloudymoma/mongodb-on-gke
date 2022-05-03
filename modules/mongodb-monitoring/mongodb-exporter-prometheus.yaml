@@ -1,0 +1,11 @@
+kind: PodMonitoring
+metadata:
+  name: mongodb-exporter
+  namespace: mongodb
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-mongodb-exporter
+  endpoints:
+  - port: metrics
+    interval: 30s

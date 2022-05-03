@@ -1,0 +1,57 @@
+timeout: 3600s # 1-hr
+tags:
+  - mongodb-ci-cd-automation
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _GCP_REGION: ${GCP_REGION}
+  _CLUSTER_NAME: ${CLUSTER_NAME}
+options:
+  substitution_option: 'ALLOW_LOOSE'
+steps:
+- name: "gcr.io/${_PROJECT_ID}/ci-cd-automation-installer"
+  id: "install-mongodb-exporter-prometheus"
+  entrypoint: 'bash'
+  args:
+    - '-xe'
+    - '-c'
+    - |
+      gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_GCP_REGION}
+
+      kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/v0.4.0/manifests/setup.yaml
+      kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/v0.4.0/manifests/operator.yaml
+
+      mongo_uri=$(kubectl get secret example-mongodb-admin-my-user -n mongodb \
+      -o json | jq -r '.data | with_entries(.value |= @base64d)' | jq -r '."connectionString.standard"')
+
+      cat <<EOF > value.yaml
+      mongodb:
+        uri: "$$mongo_uri"
+      serviceMonitor:
+        enabled: false
+      EOF
+      cat value.yaml
+
+      # cat /workspace/value.yaml
+      # sed -i'' -e  "s|MONGO_URI|$$mongo_uri|" /workspace/value.yaml
+      # cat /workspace/value.yaml
+      
+      helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+      helm repo update
+      helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f /workspace/value.yaml -n mongodb
+
+      cat <<EOF > mongodb-exporter-prometheus.yaml
+      apiVersion: monitoring.googleapis.com/v1alpha1
+      kind: PodMonitoring
+      metadata:
+        name: prom-example
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/instance: mongodb-exporter
+        endpoints:
+        - port: metrics
+          interval: 30s
+      EOF
+
+      sleep 30
+      kubectl apply -f mongodb-exporter-prometheus.yaml -n mongodb
