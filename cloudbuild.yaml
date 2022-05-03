@@ -56,5 +56,16 @@ steps:
     - |
       gcloud builds submit --config=modules/mongodb-monitoring/cloudbuild.yaml \
       --substitutions=_PROJECT_ID=${_PROJECT_ID},_GCP_REGION=${_GCP_REGION},_CLUSTER_NAME=${_CLUSTER_NAME}
-  # waitFor:
-  #   - install-mongodb-operator
+  waitFor:
+    - install-mongodb-operator
+
+- name: "gcr.io/${_PROJECT_ID}/ci-cd-automation-installer"
+  id: "install-velero-backup-restore-mongodb"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=modules/mongodb-backup-restore/cloudbuild.yaml \
+      --substitutions=_PROJECT_ID=${_PROJECT_ID},_GCP_REGION=${_GCP_REGION},_CLUSTER_NAME=${_CLUSTER_NAME}
+  waitFor:
+    - install-mongodb-operator

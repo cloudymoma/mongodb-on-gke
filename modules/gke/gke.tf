@@ -27,6 +27,11 @@ resource "google_container_cluster" "primary" {
   #  identity_namespace = "${var.project_id}.svc.id.goog"
   #}
 
+  # Enable Workload Identity
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
+
 }
 
 # Separately Managed Node Pool

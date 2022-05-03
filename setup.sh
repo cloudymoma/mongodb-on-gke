@@ -1,4 +1,5 @@
-#!/bin/bash -xe
+#!/bin/bash -x
+trap 'exit' ERR
 #export PROJECT_ID=flius-vpc-2
 
 #specify GKE cluster name, cluster domain name for mongodb
@@ -12,7 +13,6 @@ read -t 30 -p "Please input machine type you need: " MACHINE_TYPE
 echo "GKE machine type: $MACHINE_TYPE"
 export MACHINE_TYPE=$MACHINE_TYPE
 
-
 #enable service apis
 gcloud services enable compute.googleapis.com
 gcloud services enable container.googleapis.com
@@ -23,11 +23,11 @@ gcloud services enable orgpolicy.googleapis.com
 #set default region, zone
 gcloud config set compute/region us-central1
 gcloud config set compute/zone us-central1-a
-
+#
 PROJECT_ID=$(gcloud config get-value project)
 GCP_REGION=$(gcloud config get-value compute/region)
 PROJECT_NUMBER=$(gcloud projects list --filter="$PROJECT_ID" --format="value(PROJECT_NUMBER)")
-
+#
 #set iam, role bindings
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member=serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com \
@@ -56,6 +56,80 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member=serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com \
     --role roles/clouddeploy.admin
+
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member=serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com \
+    --role roles/iam.serviceAccountAdmin
+
+# for velero service account & bucket
+BUCKET=$PROJECT_ID-mongodb-backup
+gcs_check=$(gsutil ls gs://$BUCKET/  || echo 1)
+if [ $gcs_check = 1 ]
+then
+gsutil mb gs://$BUCKET/
+fi
+
+VELERO_CONST=velero
+GSA_NAME=$VELERO_CONST
+## check if service account already exists.
+flag=$(gcloud iam service-accounts list --filter="email:$GSA_NAME@$PROJECT_ID.iam.gserviceaccount.com" | wc -l | xargs)
+if [ $flag = 0 ]
+then
+  gcloud iam service-accounts create $GSA_NAME \
+      --display-name "Velero service account"
+fi
+
+# gcloud iam service-accounts list
+
+SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list \
+    --filter="displayName:Velero service account" \
+    --format 'value(email)')
+
+# ROLE_PERMISSIONS=(
+#     compute.disks.get
+#     compute.disks.create
+#     compute.disks.createSnapshot
+#     compute.snapshots.get
+#     compute.snapshots.create
+#     compute.snapshots.useReadOnly
+#     compute.snapshots.delete
+#     compute.zones.get
+#     storage.objects.create
+#     storage.objects.delete
+#     storage.objects.get
+#     storage.objects.list
+# )
+#
+# gcloud iam roles create velero.server \
+#     --project $PROJECT_ID \
+#     --title "Velero Server" \
+#     --permissions "$(IFS=","; echo "${ROLE_PERMISSIONS[*]}")"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+    --role projects/$PROJECT_ID/roles/velero.server
+
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+#         --role roles/compute.admin
+#
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+#         --role roles/compute.storageAdmin
+#
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+#         --role roles/storage.objectAdmin
+#
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+#         --role roles/storage.objectCreator
+#
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+#         --role roles/storage.legacyBucketOwner
+
+gsutil iam ch serviceAccount:$SERVICE_ACCOUNT_EMAIL:objectAdmin gs://$BUCKET
 
 #Please make sure you have the org admin permissions
 # sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/requireShieldedVm.yaml

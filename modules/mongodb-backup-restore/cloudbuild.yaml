@@ -1,0 +1,56 @@
+timeout: 3600s # 1-hr
+tags:
+  - mongodb-ci-cd-automation
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+  _GCP_REGION: ${GCP_REGION}
+  _CLUSTER_NAME: ${CLUSTER_NAME}
+options:
+  substitution_option: 'ALLOW_LOOSE'
+steps:
+- name: "gcr.io/${_PROJECT_ID}/ci-cd-automation-installer"
+  id: "install-velero-backup-restore-mongodb"
+  entrypoint: 'bash'
+  args:
+    - '-xe'
+    - '-c'
+    - |
+      gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_GCP_REGION}
+
+      VELERO_CONST=velero
+      GSA_NAME=$$VELERO_CONST
+      BUCKET=$_PROJECT_ID-mongodb-backup
+
+      NAMESPACE=$$VELERO_CONST
+      kubectl create namespace $$NAMESPACE
+
+      KSA_NAME=$$VELERO_CONST
+      kubectl create serviceaccount $$KSA_NAME --namespace $$NAMESPACE
+
+      gcloud iam service-accounts add-iam-policy-binding \
+          --role roles/iam.workloadIdentityUser \
+          --member "serviceAccount:$_PROJECT_ID.svc.id.goog[$$NAMESPACE/$$KSA_NAME]" \
+          $$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com
+
+      kubectl annotate serviceaccount $$KSA_NAME \
+          iam.gke.io/gcp-service-account=$$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com \
+          --namespace $$NAMESPACE
+
+      wget https://github.com/vmware-tanzu/velero/releases/download/v1.8.1/velero-v1.8.1-linux-amd64.tar.gz
+
+      tar zxvf velero-v1.8.1-linux-amd64.tar.gz
+      cd velero-v1.8.1-linux-amd64
+      chmod +x velero
+      cp velero /usr/local/bin/velero
+      velero -h
+
+      velero install \
+      --provider gcp \
+      --plugins velero/velero-plugin-for-gcp:v1.4.0 \
+      --bucket $$BUCKET \
+      --no-secret \
+      --sa-annotations iam.gke.io/gcp-service-account=$$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com \
+      --backup-location-config serviceAccount=$$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com
+
+      sleep 30
+      velero backup create mongodb.backup --include-namespaces mongodb
