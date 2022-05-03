@@ -13,17 +13,17 @@ cd mongodb-on-gke
 ```
 <img src="screenshot/1.png">
 
-#2. Wait for about 20 minutes.
+# 2. Wait for about 20 minutes.
 
-Go to GCP console, check the GKE cluster,
+## Go to GCP console, check the GKE cluster,
 <img src="screenshot/2.png">
 
-Verify machine type as you specified
+## Verify machine type as you specified
 <img src="screenshot/3.png">
 
-Check the workloads in namespace `mongodb`
+## Check the workloads in namespace `mongodb`
 <img src="screenshot/4.png">
 
-Verify metrics in `Managed Service for Prometheus`
+## Verify metrics in `Managed Service for Prometheus`
 <img src="screenshot/5.png">
 <img src="screenshot/6.png">
