@@ -68,4 +68,4 @@ steps:
       gcloud builds submit --config=modules/mongodb-backup-restore/cloudbuild.yaml \
       --substitutions=_PROJECT_ID=${_PROJECT_ID},_GCP_REGION=${_GCP_REGION},_CLUSTER_NAME=${_CLUSTER_NAME}
   waitFor:
-    - install-mongodb-operator
+    - install-mongodb-exporter-prometheus

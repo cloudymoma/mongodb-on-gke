@@ -1,0 +1,4 @@
+name: projects/flius-vpc-1/policies/compute.vmCanIpForward
+spec:
+  rules:
+  - allowAll: true

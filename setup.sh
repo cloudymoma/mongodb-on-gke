@@ -19,15 +19,30 @@ gcloud services enable container.googleapis.com
 gcloud services enable cloudbuild.googleapis.com
 gcloud services enable clouddeploy.googleapis.com
 gcloud services enable orgpolicy.googleapis.com
+gcloud services enable dns.googleapis.com
 
 #set default region, zone
 gcloud config set compute/region us-central1
 gcloud config set compute/zone us-central1-a
-#
+
 PROJECT_ID=$(gcloud config get-value project)
 GCP_REGION=$(gcloud config get-value compute/region)
 PROJECT_NUMBER=$(gcloud projects list --filter="$PROJECT_ID" --format="value(PROJECT_NUMBER)")
-#
+
+# Please make sure you have the org admin permissions
+# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/requireShieldedVm.yaml
+# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/requireOsLogin.yaml
+# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/vmExternalIpAccess.yaml
+# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/vmCanIpForward.yaml
+# gcloud org-policies set-policy org-policies/requireShieldedVm.yaml
+# gcloud org-policies set-policy org-policies/requireOsLogin.yaml
+# gcloud org-policies set-policy org-policies/vmExternalIpAccess.yaml
+# gcloud org-policies set-policy org-policies/vmCanIpForward.yaml
+# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/requireShieldedVm.yaml
+# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/requireOsLogin.yaml
+# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/vmExternalIpAccess.yaml
+# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/vmCanIpForward.yaml
+
 #set iam, role bindings
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member=serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com \
@@ -105,42 +120,31 @@ SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list \
 #     --title "Velero Server" \
 #     --permissions "$(IFS=","; echo "${ROLE_PERMISSIONS[*]}")"
 
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-    --role projects/$PROJECT_ID/roles/velero.server
+# gcloud projects add-iam-policy-binding $PROJECT_ID \
+#     --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+#     --role projects/$PROJECT_ID/roles/velero.server
 
-# gcloud projects add-iam-policy-binding $PROJECT_ID \
-#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-#         --role roles/compute.admin
-#
-# gcloud projects add-iam-policy-binding $PROJECT_ID \
-#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-#         --role roles/compute.storageAdmin
-#
-# gcloud projects add-iam-policy-binding $PROJECT_ID \
-#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-#         --role roles/storage.objectAdmin
-#
-# gcloud projects add-iam-policy-binding $PROJECT_ID \
-#         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
-#         --role roles/storage.objectCreator
-#
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+        --role roles/compute.admin
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+        --role roles/compute.storageAdmin
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+        --role roles/storage.objectAdmin
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
+        --role roles/storage.objectCreator
+
 # gcloud projects add-iam-policy-binding $PROJECT_ID \
 #         --member serviceAccount:$SERVICE_ACCOUNT_EMAIL \
 #         --role roles/storage.legacyBucketOwner
 
 gsutil iam ch serviceAccount:$SERVICE_ACCOUNT_EMAIL:objectAdmin gs://$BUCKET
-
-#Please make sure you have the org admin permissions
-# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/requireShieldedVm.yaml
-# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/requireOsLogin.yaml
-# sed -i .bak "s/PROJECT_ID/${PROJECT_ID}/" org-policies/vmExternalIpAccess.yaml
-# gcloud org-policies set-policy org-policies/requireShieldedVm.yaml
-# gcloud org-policies set-policy org-policies/requireOsLogin.yaml
-# gcloud org-policies set-policy org-policies/vmExternalIpAccess.yaml
-# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/requireShieldedVm.yaml
-# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/requireOsLogin.yaml
-# sed -i .bak "s/${PROJECT_ID}/PROJECT_ID/" org-policies/vmExternalIpAccess.yaml
 
 #submit cloud build job
 gcloud builds submit \

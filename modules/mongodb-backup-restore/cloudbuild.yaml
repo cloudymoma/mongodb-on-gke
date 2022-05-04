@@ -52,5 +52,6 @@ steps:
       --sa-annotations iam.gke.io/gcp-service-account=$$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com \
       --backup-location-config serviceAccount=$$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com
 
-      sleep 30
+      sleep 45
       velero backup create mongodb.backup --include-namespaces mongodb
+      velero backup describe mongodb.backup

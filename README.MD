@@ -43,3 +43,4 @@ Specify a GKE cluster name, cluster domain name for MongoDB, and machine type fo
 
 ### Velero for backup & restore
 <img src="screenshot/7.png">
+<img src="screenshot/8.png">
