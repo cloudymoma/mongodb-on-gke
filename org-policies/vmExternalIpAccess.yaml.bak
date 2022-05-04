@@ -1,4 +1,0 @@
-name: projects/flius-vpc-1/policies/compute.vmExternalIpAccess
-spec:
-  rules:
-  - allowAll: true
