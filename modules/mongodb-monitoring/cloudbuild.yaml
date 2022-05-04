@@ -1,6 +1,6 @@
 timeout: 3600s # 1-hr
 tags:
-  - mongodb-ci-cd-automation
+  - mongodb-on-gke-automation
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _GCP_REGION: ${GCP_REGION}
@@ -34,7 +34,7 @@ steps:
       # cat /workspace/value.yaml
       # sed -i'' -e  "s|MONGO_URI|$$mongo_uri|" /workspace/value.yaml
       # cat /workspace/value.yaml
-      
+
       helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
       helm repo update
       helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f /workspace/value.yaml -n mongodb

@@ -1,6 +1,6 @@
 timeout: 3600s # 1-hr
 tags:
-  - mongodb-ci-cd-automation
+  - mongodb-on-gke-automation
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _GCP_REGION: ${GCP_REGION}

@@ -1,6 +1,6 @@
 timeout: 3600s # 1-hr
 tags:
-  - mongodb-ci-cd-automation
+  - mongodb-on-gke-automation
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _GCP_REGION: ${GCP_REGION}
@@ -57,7 +57,7 @@ steps:
       # 安装MongoDB集群
       kubectl apply -f config/samples/mongodb.com_v1_mongodbcommunity_cr.yaml --namespace mongodb
 
-      sleep 240
+      sleep 180
 
       kubectl get secret example-mongodb-admin-my-user -n mongodb -o json | jq -r '.data | with_entries(.value |= @base64d)'
 

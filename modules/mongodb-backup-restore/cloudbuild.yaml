@@ -1,6 +1,6 @@
 timeout: 3600s # 1-hr
 tags:
-  - mongodb-ci-cd-automation
+  - mongodb-on-gke-automation
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _GCP_REGION: ${GCP_REGION}
@@ -53,5 +53,5 @@ steps:
       --backup-location-config serviceAccount=$$GSA_NAME@$_PROJECT_ID.iam.gserviceaccount.com
 
       sleep 45
-      velero backup create mongodb.backup --include-namespaces mongodb
-      velero backup describe mongodb.backup
+      velero backup create mongodb.backup.$_CLUSTER_NAME --include-namespaces mongodb
+      velero backup describe mongodb.backup.$_CLUSTER_NAME

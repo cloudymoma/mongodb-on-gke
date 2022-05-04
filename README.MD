@@ -23,7 +23,7 @@ git clone https://github.com/cloudymoma/mongodb-on-gke.git
 cd mongodb-on-gke
 ./setup.sh
 ```
-Specify a GKE cluster name, cluster domain name for MongoDB, and machine type for GKE node. <B>(Notes that you need to machine type with >= 4vCPU at least)</B>
+Specify a GKE cluster name, cluster domain name for MongoDB, and machine type for GKE node. <B>(Notes that you need to specify machine type with >= 4vCPU at least)</B>
 <img src="screenshot/1.png">
 
 # 2. Wait for about 20 minutes until cloud build job completes

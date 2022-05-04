@@ -1,5 +1,5 @@
 tags:
-  - mongodb-ci-cd-automation
+  - mongodb-on-gke-automation
 steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
   id: 'build-installer-image'
