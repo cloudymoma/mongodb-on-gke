@@ -9,9 +9,12 @@ export CLUSTER_NAME=$CLUSTER_NAME
 read -t 30 -p "Please input MongoDB cluster domain: " CLUSTER_DOMAIN
 echo "Mondb cluster domain: $CLUSTER_DOMAIN"
 export CLUSTER_DOMAIN=$CLUSTER_DOMAIN
-read -t 30 -p "Please input machine type you need: " MACHINE_TYPE
+read -t 30 -p "Please input machine type: " MACHINE_TYPE
 echo "GKE machine type: $MACHINE_TYPE"
 export MACHINE_TYPE=$MACHINE_TYPE
+read -t 30 -p "Please input MongoDB operator pod profile <small | medium | large>: " CLUSTER_PROFILE
+echo "MongoDB cluster profile: $CLUSTER_PROFILE"
+export CLUSTER_PROFILE=$CLUSTER_PROFILE
 
 #enable service apis
 gcloud services enable compute.googleapis.com
@@ -147,5 +150,10 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gsutil iam ch serviceAccount:$SERVICE_ACCOUNT_EMAIL:objectAdmin gs://$BUCKET
 
 #submit cloud build job
-gcloud builds submit \
---substitutions=_PROJECT_ID=${PROJECT_ID},_GCP_REGION=${GCP_REGION},_CLUSTER_NAME=${CLUSTER_NAME},_CLUSTER_DOMAIN=${CLUSTER_DOMAIN},_MACHINE_TYPE=${MACHINE_TYPE}
+gcloud builds submit --substitutions=\
+_PROJECT_ID=${PROJECT_ID},\
+_GCP_REGION=${GCP_REGION},\
+_CLUSTER_NAME=${CLUSTER_NAME},\
+_CLUSTER_DOMAIN=${CLUSTER_DOMAIN},\
+_MACHINE_TYPE=${MACHINE_TYPE},\
+_CLUSTER_PROFILE=${CLUSTER_PROFILE}

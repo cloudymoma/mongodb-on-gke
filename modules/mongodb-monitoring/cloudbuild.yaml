@@ -5,6 +5,7 @@ substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _GCP_REGION: ${GCP_REGION}
   _CLUSTER_NAME: ${CLUSTER_NAME}
+  _CLUSTER_PROFILE: ${CLUSTER_PROFILE}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
@@ -20,7 +21,7 @@ steps:
       kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/v0.4.0/manifests/setup.yaml
       kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/prometheus-engine/v0.4.0/manifests/operator.yaml
 
-      mongo_uri=$(kubectl get secret example-mongodb-admin-my-user -n mongodb \
+      mongo_uri=$(kubectl get secret mongodb-cluster-$_CLUSTER_PROFILE-admin-my-user -n mongodb \
       -o json | jq -r '.data | with_entries(.value |= @base64d)' | jq -r '."connectionString.standard"')
 
       cat <<EOF > value.yaml

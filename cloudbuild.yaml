@@ -7,6 +7,7 @@ substitutions:
   _CLUSTER_NAME: ${CLUSTER_NAME}
   _CLUSTER_DOMAIN: ${CLUSTER_DOMAIN}
   _MACHINE_TYPE: ${MACHINE_TYPE}
+  _CLUSTER_PROFILE: ${CLUSTER_PROFILE}
 
 options:
   substitution_option: 'ALLOW_LOOSE'
@@ -43,8 +44,12 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=modules/mongodb/cloudbuild.yaml \
-      --substitutions=_PROJECT_ID=${_PROJECT_ID},_GCP_REGION=${_GCP_REGION},_CLUSTER_NAME=${_CLUSTER_NAME},_CLUSTER_DOMAIN=${_CLUSTER_DOMAIN}
+      gcloud builds submit --config=modules/mongodb/cloudbuild.yaml --substitutions=\
+      _PROJECT_ID=${_PROJECT_ID},\
+      _GCP_REGION=${_GCP_REGION},\
+      _CLUSTER_NAME=${_CLUSTER_NAME},\
+      _CLUSTER_DOMAIN=${_CLUSTER_DOMAIN},\
+      _CLUSTER_PROFILE=${_CLUSTER_PROFILE}
   waitFor:
     - create-cluster
 
@@ -54,8 +59,11 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=modules/mongodb-monitoring/cloudbuild.yaml \
-      --substitutions=_PROJECT_ID=${_PROJECT_ID},_GCP_REGION=${_GCP_REGION},_CLUSTER_NAME=${_CLUSTER_NAME}
+      gcloud builds submit --config=modules/mongodb-monitoring/cloudbuild.yaml --substitutions=\
+      _PROJECT_ID=${_PROJECT_ID},\
+      _GCP_REGION=${_GCP_REGION},\
+      _CLUSTER_NAME=${_CLUSTER_NAME},\
+      _CLUSTER_PROFILE=${_CLUSTER_PROFILE}
   waitFor:
     - install-mongodb-operator
 

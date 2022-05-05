@@ -6,6 +6,7 @@ substitutions:
   _GCP_REGION: ${GCP_REGION}
   _CLUSTER_NAME: ${CLUSTER_NAME}
   _CLUSTER_DOMAIN: ${CLUSTER_DOMAIN}
+  _CLUSTER_PROFILE: ${CLUSTER_PROFILE}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
@@ -52,14 +53,14 @@ steps:
 
       #TODO
       # 修改mongdb密码
-      #sed -i "s/<your-password-here>/password/" config/samples/mongodb.com_v1_mongodbcommunity_cr.yaml
+      #sed -i "s/<your-password-here>/password/" config/samples/mongodb.com_v1_mongodbcommunity_cr_small.yaml
 
       # 安装MongoDB集群
-      kubectl apply -f config/samples/mongodb.com_v1_mongodbcommunity_cr.yaml --namespace mongodb
+      kubectl apply -f config/samples/mongodb.com_v1_mongodbcommunity_cr_$_CLUSTER_PROFILE.yaml --namespace mongodb
 
-      sleep 180
+      sleep 200
 
-      kubectl get secret example-mongodb-admin-my-user -n mongodb -o json | jq -r '.data | with_entries(.value |= @base64d)'
+      kubectl get secret mongodb-cluster-$_CLUSTER_PROFILE-admin-my-user -n mongodb -o json | jq -r '.data | with_entries(.value |= @base64d)'
 
       # cat value.yaml > /workspace/value.yaml
       # cat /workspace/value.yaml

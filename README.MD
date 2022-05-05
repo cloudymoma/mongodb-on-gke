@@ -6,7 +6,10 @@ The main purpose for this repo to provide a solution for MongoDB on GKE by lever
   - Project
   - Region
   - Machine type
-  - (WIP) MongoDB pod profile (CPU/Memory/Disk)
+  - MongoDB operator pod profile (CPU/Memory/Disk)
+  | small | medium | large |
+  | :--- | :--- | :--- |
+  | 2C/8GB/512GB SSD | 4C/16GB/1TB SSD | 8C/32G/2TB SSD |
 - Install MongoDB community operator
 - Install MongoDB exporter for `Managed Prometheus Service`
 - Install Velero, pre-create a backup for MongoDB instance
@@ -23,7 +26,7 @@ git clone https://github.com/cloudymoma/mongodb-on-gke.git
 cd mongodb-on-gke
 ./setup.sh
 ```
-Specify a GKE cluster name, cluster domain name for MongoDB, and machine type for GKE node. <B>(Notes that you need to specify machine type with >= 4vCPU at least)</B>
+Specify a GKE cluster name, cluster domain name for MongoDB, and machine type for GKE node, mongodb pod profile. <B>(Notes that you need to specify machine type with >= 4vCPU at least)</B>
 <img src="screenshot/1.png">
 
 # 2. Wait for about 20 minutes until cloud build job completes
@@ -44,3 +47,6 @@ Specify a GKE cluster name, cluster domain name for MongoDB, and machine type fo
 ### Velero for backup & restore
 <img src="screenshot/7.png">
 <img src="screenshot/8.png">
+
+## See cloud build job history
+<img src="screenshot/9.png">
