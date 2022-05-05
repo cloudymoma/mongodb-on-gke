@@ -8,7 +8,7 @@ The main purpose for this repo to provide a solution for MongoDB on GKE by lever
   - Machine type
   - MongoDB operator pod profile (CPU/Memory/Disk)
   | small | medium | large |
-  | :--- | :--- | :--- |
+  | --- | --- | --- |
   | 2C/8GB/512GB SSD | 4C/16GB/1TB SSD | 8C/32G/2TB SSD |
 - Install MongoDB community operator
 - Install MongoDB exporter for `Managed Prometheus Service`
