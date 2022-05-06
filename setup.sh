@@ -6,10 +6,10 @@ trap 'exit' ERR
 read -t 30 -p "Please input GKE cluster name: " CLUSTER_NAME
 echo "GKE cluster name: $CLUSTER_NAME"
 export CLUSTER_NAME=$CLUSTER_NAME
-read -t 30 -p "Please input MongoDB cluster domain: " CLUSTER_DOMAIN
+read -t 30 -p "Please input MongoDB cluster domain <e.g., internal.mongodb.com>: " CLUSTER_DOMAIN
 echo "Mondb cluster domain: $CLUSTER_DOMAIN"
 export CLUSTER_DOMAIN=$CLUSTER_DOMAIN
-read -t 30 -p "Please input machine type: " MACHINE_TYPE
+read -t 30 -p "Please input machine type <e.g., n2-standard-4>: " MACHINE_TYPE
 echo "GKE machine type: $MACHINE_TYPE"
 export MACHINE_TYPE=$MACHINE_TYPE
 read -t 30 -p "Please input MongoDB operator pod profile <small | medium | large>: " CLUSTER_PROFILE
