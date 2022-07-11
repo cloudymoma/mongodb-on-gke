@@ -1,0 +1,4 @@
+mongodb:
+  uri: "mongodb://my-user:password@mongodb-cluster-small-0.mongodb-cluster-small-svc.mongodb.svc.mongodb-1.flius-demo.xyz:27017,mongodb-cluster-small-1.mongodb-cluster-small-svc.mongodb.svc.mongodb-1.flius-demo.xyz:27017,mongodb-cluster-small-2.mongodb-cluster-small-svc.mongodb.svc.mongodb-1.flius-demo.xyz:27017/admin?ssl=false"
+serviceMonitor:
+  enabled: false

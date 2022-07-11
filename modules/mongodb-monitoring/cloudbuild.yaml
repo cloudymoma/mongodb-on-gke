@@ -38,7 +38,7 @@ steps:
 
       helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
       helm repo update
-      helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f /workspace/value.yaml -n mongodb
+      helm install mongodb-exporter prometheus-community/prometheus-mongodb-exporter -f /workspace/value.yaml -n mongodb --version 2.10.0
 
       cat <<EOF > mongodb-exporter-prometheus.yaml
       apiVersion: monitoring.googleapis.com/v1alpha1
