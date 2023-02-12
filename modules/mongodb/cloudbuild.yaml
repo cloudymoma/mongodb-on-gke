@@ -24,7 +24,7 @@ steps:
       gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_GCP_REGION}
 
       # 使用PD-SSD作为默认的storage class, 并支持storage expansion
-      kubectl patch sc standard -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+      kubectl patch sc standard-rwo -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
       kubectl patch sc premium-rwo -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
       kubectl create namespace mongodb
